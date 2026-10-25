@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Μόνος στο σπίτι — Greek A2 Reader</title>
+<style>
+:root{
+  --kimi-font-sans:-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --kimi-color-text-primary:#1a1a1a;
+  --kimi-color-text-secondary:#525252;
+  --kimi-color-text-tertiary:#737373;
+  --kimi-color-text-quaternary:#a3a3a3;
+  --kimi-color-surface-raised:#ffffff;
+  --kimi-color-border:#e5e5e5;
+  --kimi-chart-3:#22c55e;
+  --t-fast:120ms;
+  --ease-out:cubic-bezier(.2,.6,.3,1);
+}
+body{margin:0;background:#fff;padding:24px 16px}
+.gkwrap{max-width:680px;margin:0 auto}
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="gkwrap">
+<style>
+.gk{font-family:var(--kimi-font-sans);padding:4px 0;max-width:680px}
+.gk button{font:inherit}
+.gk h1{font-size:20px;font-weight:500;margin:0;letter-spacing:0}
+.gk .sub{font-size:14px;color:var(--kimi-color-text-secondary);margin:4px 0 0}
+.gk .bar{display:flex;align-items:center;gap:8px;margin:16px 0 12px;flex-wrap:wrap}
+.gk .bar .sp{flex:1}
+.gk .chip{border:1px solid var(--kimi-color-border);background:transparent;color:var(--kimi-color-text-secondary);border-radius:6px;padding:6px 12px;font-size:14px;cursor:pointer;transition:all var(--t-fast) var(--ease-out)}
+.gk .chip:hover{color:var(--kimi-color-text-primary)}
+.gk .chip.on{color:var(--kimi-color-text-primary);background:color-mix(in srgb, var(--kimi-color-text-primary) 10%, transparent);border-color:transparent}
+.gk .story{position:relative;font-size:17px;line-height:32px;color:var(--kimi-color-text-primary)}
+.gk .story.study{line-height:24px}
+.gk p.para{margin:0 0 16px}
+.gk .pnum{color:var(--kimi-color-text-quaternary);font-size:12px;margin-right:8px;vertical-align:2px}
+.gk .sent{border-radius:6px;padding:2px 2px;transition:background var(--t-fast) var(--ease-out)}
+.gk .sent.hl{background:color-mix(in srgb, var(--kimi-chart-3) 15%, transparent)}
+.gk .w{cursor:pointer;border-radius:4px;padding:0 1px;transition:background var(--t-fast) var(--ease-out)}
+.gk .w:hover{background:color-mix(in srgb, var(--kimi-color-text-primary) 8%, transparent)}
+.gk .w.on{background:color-mix(in srgb, var(--kimi-color-text-primary) 14%, transparent)}
+.gk .w.hi{background:color-mix(in srgb, #3b82f6 18%, transparent)}
+.gk .t{display:none;font-size:12px;line-height:14px;color:var(--kimi-color-text-tertiary)}
+.gk .story.study .t{display:block}
+.gk .bubble{position:absolute;z-index:5;display:none;background:var(--kimi-color-surface-raised);border:1px solid var(--kimi-color-border);border-radius:10px;padding:8px 12px;font-size:14px;transform:translate(-50%,-100%);white-space:nowrap}
+.gk .bubble::after{content:'';position:absolute;left:50%;bottom:-5px;width:8px;height:8px;background:var(--kimi-color-surface-raised);border-right:1px solid var(--kimi-color-border);border-bottom:1px solid var(--kimi-color-border);transform:translateX(-50%) rotate(45deg)}
+.gk .bubble .gr{font-weight:500;margin-right:8px}
+.gk .bubble .en{color:var(--kimi-color-text-secondary)}
+.gk .vochead{display:flex;align-items:baseline;gap:8px;margin:20px 0 8px}
+.gk .vochead h2{font-size:15px;font-weight:500;margin:0}
+.gk .vochead span{font-size:12px;color:var(--kimi-color-text-tertiary)}
+.gk .voc{display:none;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:2px 20px;font-size:14px}
+.gk .voc.show{display:grid}
+.gk .v{display:flex;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;transition:background var(--t-fast) var(--ease-out)}
+.gk .v:hover{background:color-mix(in srgb, var(--kimi-color-text-primary) 6%, transparent)}
+.gk .vg{font-weight:500;min-width:88px}
+.gk .vd{color:var(--kimi-color-text-secondary)}
+</style>
+<div class="gk">
+  <h1>Μόνος στο σπίτι</h1>
+  <p class="sub">A2 level · based on the film <em>Home Alone</em> · click a word for English · ~100 words</p>
+  <div class="bar">
+    <button class="chip" id="btnRead">▶ Read aloud</button>
+    <button class="chip" id="btnSlow">Slow</button>
+    <button class="chip" id="btnStudy">Study mode</button>
+    <button class="chip" id="btnVoc">Vocabulary</button>
+    <span class="sp"></span>
+    <span class="sub" id="cnt" style="margin:0"></span>
+  </div>
+  <div class="story" id="story"></div>
+  <div class="vochead" id="vochead" style="display:none"><h2>Vocabulary</h2><span>click a word to highlight it in the story</span></div>
+  <div class="voc" id="voc"></div>
+</div>
+<script>
+const STORY = `Ο Κέβιν είναι ένα οκτάχρονο αγόρι. Η μεγάλη οικογένειά του πηγαίνει στο Παρίσι για τα Χριστούγεννα, αλλά στο αεροδρόμιο ο Κέβιν μένει μόνος στο σπίτι.
+Στην αρχή είναι πολύ χαρούμενος. Τρώει παγωτό για πρωινό και βλέπει ταινίες όλη τη νύχτα. Αλλά μετά δύο κλέφτες, ο Χάρι και ο Μαρβ, θέλουν να μπουν στο σπίτι.
+Ο Κέβιν είναι έξυπνος. Φτιάχνει πολλές παγίδες: πάγο στην πόρτα, παιχνίδια στο πάτωμα και κόλλα στις σκάλες. Οι κλέφτες τρέχουν, πέφτουν και φωνάζουν πολύ.
+Τελικά η αστυνομία έρχεται και τους παίρνει. Η οικογένεια του Κέβιν γυρνάει και όλοι είναι πάλι μαζί. Τα Χριστούγεννα είναι όμορφα στο σπίτι.`;
+const DICT = {
+'ο':'the (m.)','η':'the (f.)','κέβιν':'Kevin','είναι':'is / are','ένα':'a, one (n.)','οκτάχρονο':'eight-year-old',
+'αγόρι':'boy','μεγάλη':'big','οικογένειά':'family','του':'his; of the (m.)','πηγαίνει':'goes',
+'παρίσι':'Paris','για':'for','τα':'the (pl. n.)','χριστούγεννα':'Christmas','αλλά':'but',
+'αεροδρόμιο':'airport','μένει':'stays, remains','μόνος':'alone','σπίτι':'home, house','στο':'to / at the (n.)',
+'στην':'in / on the (f.)','αρχή':'beginning, start','πολύ':'very, a lot','χαρούμενος':'happy','τρώει':'eats',
+'παγωτό':'ice cream','πρωινό':'breakfast','βλέπει':'watches, sees','ταινίες':'movies','όλη':'all, whole',
+'τη':'the (f. acc.)','νύχτα':'night','μετά':'after; afterwards','δύο':'two','κλέφτες':'thieves',
+'χάρι':'Harry','και':'and','μαρβ':'Marv','θέλουν':'want','να':'to',
+'μπουν':'(to) enter','έξυπνος':'smart, clever','φτιάχνει':'makes, builds','πολλές':'many','παγίδες':'traps',
+'πάγο':'ice','πόρτα':'door','παιχνίδια':'toys','πάτωμα':'floor','κόλλα':'glue',
+'στις':'on the (pl./f.)','σκάλες':'stairs','οι':'the (pl.)','τρέχουν':'run','πέφτουν':'fall',
+'φωνάζουν':'shout','τελικά':'finally','αστυνομία':'police','έρχεται':'comes, arrives','τους':'them; the (m. pl.)',
+'παίρνει':'takes; arrests','οικογένεια':'family','γυρνάει':'returns, comes back','όλοι':'everyone, all','πάλι':'again',
+'μαζί':'together','όμορφα':'beautiful, lovely'
+};
+const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const clean = w => w.toLowerCase().replace(/^[.,!?;:«»"()]+|[.,!?;:«»"()]+$/g,'');
+const key = w => fold(clean(w));
+const ND = {};
+for (const k in DICT) ND[fold(k)] = DICT[k];
+const storyEl = document.getElementById('story');
+const used = {};
+STORY.trim().split(/\n+/).forEach((para, pi) => {
+  const p = document.createElement('p');
+  p.className = 'para';
+  p.innerHTML = '<span class="pnum">' + (pi+1) + '</span>';
+  const sents = para.match(/[^.!?]*[.!?]+|[^.!?]+$/g) || [];
+  sents.forEach(sent => {
+    const ss = document.createElement('span');
+    ss.className = 'sent';
+    sent.trim().split(/\s+/).forEach(tok => {
+      const kk = key(tok);
+      if (!ND[kk]) { ss.appendChild(document.createTextNode(tok + ' ')); return; }
+      if (!used[kk]) used[kk] = {gr: clean(tok), en: ND[kk]};
+      const s = document.createElement('span');
+      s.className = 'w';
+      s.dataset.n = kk;
+      s.innerHTML = '<span class="g">' + tok + '</span> <span class="t">' + ND[kk].split(';')[0].split(',')[0] + '</span>';
+      ss.appendChild(s);
+      ss.appendChild(document.createTextNode(' '));
+    });
+    p.appendChild(ss);
+    p.appendChild(document.createTextNode(' '));
+  });
+  storyEl.appendChild(p);
+});
+const bubble = document.createElement('div');
+bubble.className = 'bubble';
+bubble.innerHTML = '<span class="gr"></span><span class="en"></span>';
+storyEl.appendChild(bubble);
+let open = null;
+function place(span){
+  const r = span.getBoundingClientRect(), c = storyEl.getBoundingClientRect();
+  bubble.style.left = (r.left - c.left + r.width/2) + 'px';
+  bubble.style.top = (r.top - c.top - 6) + 'px';
+  bubble.style.display = 'block';
+}
+function closeBubble(){ bubble.style.display = 'none'; if (open){open.classList.remove('on');open=null;} }
+storyEl.addEventListener('click', e => {
+  const s = e.target.closest('.w');
+  if (!s) { closeBubble(); return; }
+  if (open) open.classList.remove('on');
+  open = s; s.classList.add('on');
+  bubble.querySelector('.gr').textContent = clean(s.querySelector('.g').textContent);
+  bubble.querySelector('.en').textContent = ND[s.dataset.n];
+  place(s);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBubble(); });
+window.addEventListener('resize', () => { if (open && bubble.style.display === 'block') place(open); });
+const btnStudy = document.getElementById('btnStudy');
+btnStudy.onclick = () => { storyEl.classList.toggle('study'); btnStudy.classList.toggle('on'); };
+const btnVoc = document.getElementById('btnVoc'), voc = document.getElementById('voc'), vochead = document.getElementById('vochead');
+let vocBuilt = false;
+btnVoc.onclick = () => {
+  voc.classList.toggle('show'); btnVoc.classList.toggle('on');
+  vochead.style.display = voc.classList.contains('show') ? 'flex' : 'none';
+  if (!vocBuilt) {
+    vocBuilt = true;
+    Object.keys(used).sort((a,b) => used[a].gr.localeCompare(used[b].gr, 'el'))
+      .forEach(kk => {
+        const d = document.createElement('div');
+        d.className = 'v';
+        d.innerHTML = '<span class="vg">' + used[kk].gr + '</span><span class="vd">' + used[kk].en + '</span>';
+        d.onclick = () => {
+          const on = d.classList.contains('on');
+          voc.querySelectorAll('.v.on').forEach(x => x.classList.remove('on'));
+          storyEl.querySelectorAll('.w.hi').forEach(x => x.classList.remove('hi'));
+          if (on) return;
+          d.classList.add('on');
+          storyEl.querySelectorAll('.w').forEach(w => { if (w.dataset.n === kk) w.classList.add('hi'); });
+        };
+        voc.appendChild(d);
+      });
+  }
+};
+document.getElementById('cnt').textContent = Object.keys(used).length + ' unique words';
+const btnRead = document.getElementById('btnRead'), btnSlow = document.getElementById('btnSlow');
+const canSpeak = 'speechSynthesis' in window;
+let elVoice = null;
+if (canSpeak) {
+  const pick = () => { const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().indexOf('el') === 0); if (v) elVoice = v; };
+  pick();
+  speechSynthesis.onvoiceschanged = pick;
+} else {
+  btnRead.disabled = true;
+  btnRead.textContent = 'Read aloud (not supported)';
+}
+let playing = false, idx = 0, sentsEls = [];
+btnSlow.onclick = () => btnSlow.classList.toggle('on');
+function finishRead(){
+  playing = false;
+  if (canSpeak) speechSynthesis.cancel();
+  sentsEls.forEach(el => el.classList.remove('hl'));
+  btnRead.classList.remove('on');
+  btnRead.textContent = '▶ Read aloud';
+}
+function speakNext(){
+  if (!playing || idx >= sentsEls.length) { finishRead(); return; }
+  const el = sentsEls[idx];
+  sentsEls.forEach(x => x.classList.remove('hl'));
+  el.classList.add('hl');
+  const text = Array.from(el.querySelectorAll('.g')).map(g => g.textContent).join(' ');
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'el-GR';
+  if (elVoice) u.voice = elVoice;
+  u.rate = btnSlow.classList.contains('on') ? 0.75 : 0.95;
+  u.onend = () => { idx++; speakNext(); };
+  u.onerror = finishRead;
+  speechSynthesis.speak(u);
+}
+btnRead.onclick = () => {
+  if (!canSpeak) return;
+  if (playing) { finishRead(); return; }
+  closeBubble();
+  speechSynthesis.cancel();
+  sentsEls = Array.from(storyEl.querySelectorAll('.sent'));
+  idx = 0; playing = true;
+  btnRead.classList.add('on');
+  btnRead.textContent = '■ Stop';
+  speakNext();
+};
+</script>
+</div>
+</body>
+</html>
